@@ -1,0 +1,8 @@
+---
+- hosts: splunk
+  become: yes
+  tasks:
+   - name: Copy Splunk Agent
+     copy:
+      src: /etc/ansible/splunkforwarder-7.1.2-a0c72a66db66-linux-2.6-x86_64.rpm
+      dest: /opt

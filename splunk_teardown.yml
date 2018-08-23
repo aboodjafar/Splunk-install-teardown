@@ -1,0 +1,38 @@
+---
+- hosts:  
+  become: yes
+  tasks:
+   - name: Remove Splunk package
+     yum:
+       name: splunkforwarder-7.1.2-a0c72a66db66.x86_64
+       state: absent
+
+   - name: Delete Splunk binaries
+     file:
+       path: /opt/splunkforwarder/
+       state: absent
+
+   - name: Delete Splunk Init script
+     file:
+       path: /etc/rc.d/init.d/splunk
+       state: absent
+
+   - name: Remove splunk user
+     user: 
+       name: splunk
+       state: absent
+       remove: yes
+
+   - name: Show Splunkd process
+     shell: ps -ef | grep splunkd
+     register: splunk
+   - debug: var=splunk.stdout_lines
+
+   - name: Kill Splunkd process if it's running
+     shell: killall -9 splunkd
+     ignore_errors: yes
+
+   - name: Show Splunkd process
+     shell: ps -ef | grep splunkd
+     register: splunk
+   - debug: var=splunk.stdout_lines

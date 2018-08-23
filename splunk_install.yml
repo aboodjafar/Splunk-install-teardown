@@ -1,0 +1,40 @@
+---
+- hosts:  
+  become: yes
+  tasks:
+   - name: Push RPM package to server 
+     copy: 
+       src: /etc/ansible/splunkforwarder-7.1.2-a0c72a66db66-linux-2.6-x86_64.rpm
+       dest: /opt
+     tags: rpm
+
+   - name: Install Splunk Forwarder RPM
+     yum:
+       name: /opt/splunkforwarder-7.1.2-a0c72a66db66-linux-2.6-x86_64.rpm
+       state: present
+     tags: rpm
+  
+   - name: Accept License and Start Splunk
+     shell: /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --auto-ports --no-prompt --auth admin:changeme
+     tags: license
+ 
+   - name: Configure and set deploy-poll for Splunk
+     shell: /opt/splunkforwarder/bin/splunk set deploy-poll 10.19.23.48:8089 -auth admin:changeme
+     register: configure
+   - debug: var=configure.stdout
+     tags: config
+
+   - name: Enable boot-start
+     shell: /opt/splunkforwarder/bin/splunk enable boot-start
+     register: bootstart
+   - debug: var=bootstart.stdout_lines
+     tags: boot
+
+   - name: Restart Splunk service
+     shell: /opt/splunkforwarder/bin/splunk restart
+
+   - name: Check if Splunk if configured correctly
+     shell: cat /opt/splunkforwarder/etc/system/local/deploymentclient.conf
+     register: output
+   - debug: var=output.stdout_lines
+     tags: deploymentclient
