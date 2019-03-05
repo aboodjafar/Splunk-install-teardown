@@ -19,7 +19,7 @@
      tags: license
  
    - name: Configure and set deploy-poll for Splunk
-     shell: /opt/splunkforwarder/bin/splunk set deploy-poll 10.19.23.48:8089 -auth admin:changeme
+     shell: /opt/splunkforwarder/bin/splunk set deploy-poll 10.10.10.10:8080 -auth admin:changeme
      register: configure
    - debug: var=configure.stdout
      tags: config
